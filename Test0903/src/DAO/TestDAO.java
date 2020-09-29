@@ -11,6 +11,7 @@ import java.util.List;
 import DB.DBConnection;
 import DTO.MemberDTO;
 import DTO.BoardDTO;
+import DTO.CommentDTO;
 
 
 public class TestDAO {
@@ -684,5 +685,62 @@ public class TestDAO {
 			return listCount;
 		}
 
+		public List<CommentDTO> boardViewComment(int bnumber) {
+			String sql = "SELECT * FROM BOARD_COMMENT WHERE BNUMBER=?";
+			List<CommentDTO> clist = new ArrayList<CommentDTO>();
+			CommentDTO cDTO = null;
+			try {
+				pstmt = con.prepareStatement(sql);
+				pstmt.setInt(1, bnumber);
+				rs = pstmt.executeQuery();
+				while(rs.next()) {
+					cDTO = new CommentDTO();
+					cDTO.setCnumber(rs.getInt("CNUMBER"));
+					cDTO.setBnumber(rs.getInt("BNUMBER"));
+					cDTO.setMid(rs.getString("MID"));
+					cDTO.setContent(rs.getString("CONTENT"));
+					cDTO.setBdate(rs.getDate("BDATE"));
+					clist.add(cDTO);
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				pstmtClose();
+				rsClose();
+			}
+			return clist;
+		}
+
+		public int commentinsert(CommentDTO cDTO) {
+			String sql = "INSERT INTO BOARD_COMMENT(CNUMBER, BNUMBER, MID, BDATE, CONTENT)VALUES(COMMENT_SEQ.NEXTVAL,?,?,SYSDATE,?)";
+			int result = 0;
+			try {
+				pstmt = con.prepareStatement(sql);
+				pstmt.setInt(1, cDTO.getBnumber());
+				pstmt.setString(2, cDTO.getMid());
+				pstmt.setString(3, cDTO.getContent());
+				result = pstmt.executeUpdate();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				pstmtClose();
+			} 
+			return result;
+		}
+
+		public int commentdelete(int cnumber) {
+			String sql = "DELETE FROM BOARD_COMMENT WHERE CNUMBER=?";
+			int result = 0;
+			try {
+				pstmt = con.prepareStatement(sql);
+				pstmt.setInt(1, cnumber);
+				result = pstmt.executeUpdate();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				pstmtClose();
+			} 
+			return result;
+		}
 
 }

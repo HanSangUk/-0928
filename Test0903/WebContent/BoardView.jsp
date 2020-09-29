@@ -43,6 +43,17 @@ table, th, td {
 			alert("작성자가 아닙니다");
 		}
 	}
+	function comment(){
+		commentform.submit();
+	}
+	function commentdelete(cnumber, bnumber, mid){
+		var id = '${sessionScope.loginId}';
+		if(id==mid){
+			location.href = "commentdelete?cnumber="+cnumber+"&bnumber="+bnumber;
+		} else {
+			alert("작성자가 아닙니다.");
+		}
+	}
 </script>
 <style>
 	.view{
@@ -53,6 +64,7 @@ table, th, td {
         margin:auto;
         display:block;
         padding: 20px;
+        overflow:auto;
 	}
 	#bcontents{
 		padding:10px;		
@@ -95,6 +107,26 @@ table, th, td {
 	h1{
 		text-align: center;
 	}
+	.clist{
+		margin:auto;
+		display:block;
+		margin-top:10px;
+		text-align: center;
+		border:2px solid black;
+		border-radius: 20px;
+		width: 550px;
+		padding:20px;
+	}
+	.make{
+		margin:20px 80px 0px 100px;
+		padding: 20px;
+		width: 350px;
+		text-align: left;
+	}
+	input{
+		width:200px;
+		height: 40px;
+	}
 </style>
 </head>
 <body>
@@ -131,6 +163,36 @@ table, th, td {
 	<button class="buttons" onclick="boarddelete('${viewDTO.bnumber}', '${viewDTO.bwriter}')" style=" font-size: 20px;"><i class="fas fa-trash-alt"></i> 삭제</button>
 	</div>
 </div>
+<div class = "clist">
+<h2 style="text-align: center;"><i class="far fa-comment"></i> 댓글 창 <i class="far fa-comment"></i></h2><br>
+		<table>
+			<tr>
+				<th style="width: 80px; height: 50px;">작성자</th>
+				<th style="width: 220px;">내용</th>
+				<th style="width: 120px;">작성일자</th>
+				<th style="width: 80px;"></th>
+			</tr>
+			<c:forEach var="clist" items="${clist}">
+			<tr>
+				<td style="height:35px;">${clist.mid}</td>
+				<td>${clist.content}</td>
+				<td>${clist.bdate}</td>
+				<td><button onclick="commentdelete('${clist.cnumber}', '${clist.bnumber}', '${clist.mid}')">삭제</button></td>
+			</tr>
+			</c:forEach>
+		</table>
+	<form action="commentinsert" method="post" name="commentform">
+		<c:if test="${not empty sessionScope.loginId}">
+		<div class = "make">
+		<input type="hidden" style="width: 80px;" name="clist_mid" id="clist_mid" value="${sessionScope.loginId}" readonly><br>
+		ID : ${sessionScope.loginId}<br>
+		<input type="text" name="clist_content" id="clist_content" placeholder="댓글을 입력하세요.">
+		<input type="hidden" name="clist_bnumber" id="clist_bnumber" value="${viewDTO.bnumber}">
+		<button onclick="comment()">댓글 작성</button>
+		</div>
+		</c:if>
+	</form>
+	</div>
 <jsp:include page="footer.jsp" flush="false" />	
 </body>
 </html>
